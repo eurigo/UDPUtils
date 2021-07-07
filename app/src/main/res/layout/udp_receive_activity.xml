@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:focusableInTouchMode="true"
+    android:focusable="true"
+    android:keepScreenOn="true"
+    >
+
+    <TextView
+        android:id="@+id/tv_send_host"
+        android:layout_width="@dimen/dp_84"
+        android:layout_height="@dimen/dp_40"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="目标IP："
+        android:gravity="center"
+        />
+
+    <EditText
+        android:id="@+id/et_send_host"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_40"
+        app:layout_constraintStart_toEndOf="@+id/tv_send_host"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:gravity="center"
+        tools:text="192.168.1142.255"
+        android:background="@null"
+        android:hint="请输入发送数据的目标IP"
+        android:paddingHorizontal="@dimen/dp_10"
+        android:textSize="@dimen/sp_14"
+        />
+
+    <TextView
+        android:id="@+id/tv_send_port"
+        android:layout_width="@dimen/dp_84"
+        android:layout_height="@dimen/dp_40"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_send_host"
+        app:layout_constraintEnd_toStartOf="@+id/et_send_port"
+        android:text="目标端口："
+        android:gravity="center"
+        />
+
+    <EditText
+        android:id="@+id/et_send_port"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/dp_40"
+        app:layout_constraintStart_toEndOf="@+id/tv_send_port"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_send_host"
+        android:gravity="center"
+        tools:text="9090"
+        android:inputType="number"
+        android:background="@null"
+        android:hint="请输入发送数据的目标端口"
+        android:textSize="@dimen/sp_14"
+        />
+
+    <TextView
+        android:id="@+id/tv_send_content"
+        android:layout_width="@dimen/dp_84"
+        android:layout_height="@dimen/def_height"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/btn_udp_send"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_udp_send"
+        app:layout_constraintEnd_toStartOf="@+id/et_send_port"
+        android:text="发送内容："
+        android:gravity="center"
+        />
+
+    <EditText
+        android:id="@+id/et_send_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toEndOf="@+id/tv_send_content"
+        app:layout_constraintEnd_toStartOf="@+id/btn_udp_send"
+        app:layout_constraintTop_toTopOf="@+id/btn_udp_send"
+        app:layout_constraintBottom_toBottomOf="@+id/btn_udp_send"
+        android:gravity="center"
+        tools:text="12416"
+        android:background="@null"
+        android:hint="请输入发送的内容"
+        android:textSize="@dimen/sp_14"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_udp_send"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/def_height"
+        app:layout_constraintTop_toBottomOf="@+id/tv_send_port"
+        app:layout_constraintStart_toStartOf="@+id/btn_udp_receive"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        android:layout_marginBottom="@dimen/dp_10"
+        android:backgroundTint="@android:color/holo_blue_light"
+        android:text="发送数据"
+        android:layout_marginTop="@dimen/dp_4"
+        />
+
+    <TextView
+        android:id="@+id/tv_receive_port"
+        android:layout_width="@dimen/dp_84"
+        android:layout_height="@dimen/def_height"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_udp_send"
+        app:layout_constraintEnd_toStartOf="@+id/et_receive_port"
+        android:text="监听接口："
+        android:gravity="center"
+        android:layout_marginTop="@dimen/dp_4"
+        />
+
+    <EditText
+        android:id="@+id/et_receive_port"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/def_height"
+        app:layout_constraintStart_toEndOf="@+id/tv_send_host"
+        app:layout_constraintEnd_toStartOf="@+id/btn_udp_receive"
+        app:layout_constraintTop_toBottomOf="@+id/btn_udp_send"
+        android:gravity="center"
+        tools:text="9090"
+        android:inputType="number"
+        android:background="@null"
+        android:hint="请输入监听接口"
+        android:paddingHorizontal="@dimen/dp_10"
+        android:layout_marginTop="@dimen/dp_4"
+        android:textSize="@dimen/sp_14"
+        />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_udp_receive"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        app:layout_constraintTop_toBottomOf="@+id/btn_udp_send"
+        app:layout_constraintStart_toEndOf="@+id/et_receive_port"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="@dimen/dp_10"
+        android:backgroundTint="@android:color/holo_blue_light"
+        android:text="开始接收"
+        android:layout_marginTop="@dimen/dp_4"
+        />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rcv_udp_receive"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@+id/btn_udp_receive"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="@dimen/dp_4"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

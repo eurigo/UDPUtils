@@ -1,0 +1,5 @@
+rootProject.name = "UDPUtils"
+include ':app'
+include ':app:udputil'
+include ':udputil'
+include ':udplibrary'
