@@ -18,7 +18,7 @@ allprojects {
 + 在app模块下的`build.gradle`文件中加入
 ```
 dependencies {
-    implementation 'com.github.fjyuqiang:UDPUtils:Tag'
+    implementation 'com.gitee.eurigo:UDPUtils:1.0.2'
 }
 ```
 
