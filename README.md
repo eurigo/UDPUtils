@@ -1,7 +1,7 @@
-# UDPUtils
+# UDPUtils [![](https://jitpack.io/v/eurigo/UDPUtils.svg)](https://jitpack.io/#eurigo/UDPUtils)
 Android UDP通讯工具类，支持Json格式传输。
 
-[![](https://jitpack.io/v/eurigo/UDPUtils.svg)](https://jitpack.io/#eurigo/UDPUtils)
++ 码云地址：[Gitee](https://gitee.com/Eurigo/UDPUtils)
 
 ### 集成使用
 
