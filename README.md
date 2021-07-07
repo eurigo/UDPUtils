@@ -2,7 +2,7 @@
 
 Android UDP通讯工具类，支持Json格式传输。
 
-+ [Github](https://github.com/eurigo/UDPUtils)
++ 已同步[Github](https://github.com/eurigo/UDPUtils)
 
 ### 集成使用
 
