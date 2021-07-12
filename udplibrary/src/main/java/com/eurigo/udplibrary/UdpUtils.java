@@ -27,24 +27,31 @@ import java.util.regex.Pattern;
  * Created on 2021/7/1 14:43
  * desc   : UDP传输工具类
  */
-public class UDPUtils {
+public class UdpUtils {
 
-    private static final String TAG = "UDPUtils";
+    private static final String TAG = "UdpUtils";
 
-    private static UDPUtils udpUtils;
-
-    public UDPUtils() {
+    public UdpUtils() {
     }
 
-    public static UDPUtils getInstance() {
-        if (null == udpUtils) {
-            udpUtils = SingletonHelper.INSTANCE;
+    public static UdpUtils getInstance() {
+        return SingletonHelper.INSTANCE;
+    }
+
+    public void startUdpSocket() {
+        if (client != null) {
+            return;
         }
-        return udpUtils;
-    }
-
-    private static class SingletonHelper {
-        private final static UDPUtils INSTANCE = new UDPUtils();
+        try {
+            // Socket接收数据监听的端口，默认为9090
+            client = new DatagramSocket(getCurrentPort());
+            if (receivePacket == null) {
+                receivePacket = new DatagramPacket(receiveByte, BUFFER_LENGTH);
+            }
+            startSocketThread();
+        } catch (SocketException e) {
+            e.printStackTrace();
+        }
     }
 
     public static final String DEFAULT_SOCKET_HOST = "192.168.42.129";
@@ -91,42 +98,6 @@ public class UDPUtils {
     private DatagramSocket client;
     private ExecutorService executorService;
 
-    public void startUDPSocket() {
-        if (client != null) {
-            return;
-        }
-        try {
-            // Socket接收数据监听的端口，默认为9090
-            client = new DatagramSocket(getCurrentPort());
-            if (receivePacket == null) {
-                receivePacket = new DatagramPacket(receiveByte, BUFFER_LENGTH);
-            }
-            startSocketThread();
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 开启接收数据的线程
-     **/
-    private void startSocketThread() {
-        executorService = new ThreadPoolExecutor(2 * CPU_COUNT + 1
-                , 2 * CPU_COUNT + 1
-                , 30
-                , TimeUnit.SECONDS
-                , new LinkedBlockingQueue<>()
-                , new UdpThreadFactory("io", Thread.NORM_PRIORITY));
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                isThreadRunning = true;
-                Log.e(TAG, "UDP clientThread is running...");
-                receiveMessage();
-            }
-        });
-    }
-
     /**
      * 处理接受到的消息
      **/
@@ -137,7 +108,7 @@ public class UDPUtils {
                     client.receive(receivePacket);
                 } catch (IOException e) {
                     Log.e(TAG, "UDP数据包接收失败！线程停止");
-                    stopUDPSocket();
+                    stopUdpSocket();
                     e.printStackTrace();
                     return;
                 }
@@ -165,14 +136,35 @@ public class UDPUtils {
     }
 
     /**
+     * 开启接收数据的线程
+     **/
+    private void startSocketThread() {
+        executorService = new ThreadPoolExecutor(2 * CPU_COUNT + 1
+                , 2 * CPU_COUNT + 1
+                , 30
+                , TimeUnit.SECONDS
+                , new LinkedBlockingQueue<>()
+                , new UdpThreadFactory("io", Thread.NORM_PRIORITY));
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                isThreadRunning = true;
+                Log.e(TAG, "UDP clientThread is running...");
+                receiveMessage();
+            }
+        });
+    }
+
+    /**
      * 发送消息
+     *
      * @param message 消息文本
      */
     public void sendMessage(final String message) {
         if (client == null) {
-            startUDPSocket();
+            startUdpSocket();
         }
-        Log.e(TAG, "发送的消息："+message);
+        Log.e(TAG, "发送的消息：" + message);
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -195,7 +187,7 @@ public class UDPUtils {
      */
     public void sendMessage(Map<String, String> map){
         if (client == null) {
-            startUDPSocket();
+            startUdpSocket();
         }
         JsonObject object = new JsonObject();
         // 包装Json
@@ -220,18 +212,9 @@ public class UDPUtils {
     }
 
     /**
-     * 是否为Ip地址
-     * @param regexString 匹配的字符串
-     * @return 是否是IP
-     */
-    public boolean isIpAddress(String regexString){
-        return regexString != null && regexString.length() > 0 && Pattern.matches(REGEX_IP, regexString);
-    }
-
-    /**
      * 停止UDP
      **/
-    public void stopUDPSocket() {
+    public void stopUdpSocket() {
         isThreadRunning = false;
         receivePacket = null;
         if (client != null) {
@@ -241,11 +224,26 @@ public class UDPUtils {
         onUdpReceiveListener = null;
     }
 
+    /**
+     * 是否为Ip地址
+     *
+     * @param regexString 匹配的字符串
+     * @return 是否是IP
+     */
+    public boolean isIpAddress(String regexString) {
+        return regexString != null && regexString.length() > 0 && Pattern.matches(REGEX_IP, regexString);
+    }
+
+    private static class SingletonHelper {
+        private final static UdpUtils INSTANCE = new UdpUtils();
+    }
+
     public interface OnUdpReceiveListener {
         /**
          * 接收到数据包，
          * 在{@link #receiveMessage} 中回调，！！请勿直接在OnReceived中操作UI，
          * 【如果必要，请使用{@link android.app.Activity#runOnUiThread(Runnable)}切换到UI线程】
+         *
          * @param data 数据包
          */
         void onReceived(String data);

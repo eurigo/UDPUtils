@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.blankj.utilcode.util.NetworkUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
-import com.eurigo.udplibrary.UDPUtils;
+import com.eurigo.udplibrary.UdpUtils;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ import java.util.ArrayList;
  * desc   :
  */
 public class UdpActivity extends AppCompatActivity implements
-        View.OnClickListener, UDPUtils.OnUdpReceiveListener {
+        View.OnClickListener, UdpUtils.OnUdpReceiveListener {
 
     private LogAdapter mAdapter;
     private MaterialButton btnSend, btnReceive;
@@ -62,44 +62,44 @@ public class UdpActivity extends AppCompatActivity implements
             case R.id.btn_udp_send:
                 // 重置目标IP
                 String host = getEditText(etSendHost);
-                if (!UDPUtils.getInstance().isIpAddress(host)){
+                if (!UdpUtils.getInstance().isIpAddress(host)) {
                     ToastUtils.showShort("请输入正确的IP地址！");
                     return;
                 }
-                if (!TextUtils.isEmpty(host) && !host.equals(UDPUtils.getInstance().getCurrentHost())){
-                    UDPUtils.getInstance().setUdpHost(host);
+                if (!TextUtils.isEmpty(host) && !host.equals(UdpUtils.getInstance().getCurrentHost())) {
+                    UdpUtils.getInstance().setUdpHost(host);
                 }
                 // 重置目标端口
-                if (!TextUtils.isEmpty(getEditText(etSendPort))){
+                if (!TextUtils.isEmpty(getEditText(etSendPort))) {
                     int port = Integer.parseInt(getEditText(etSendPort));
-                    if (port != UDPUtils.getInstance().getCurrentPort()) {
-                        UDPUtils.getInstance().setUdpPort(port);
+                    if (port != UdpUtils.getInstance().getCurrentPort()) {
+                        UdpUtils.getInstance().setUdpPort(port);
                     }
                 }
-                if (TextUtils.isEmpty(getEditText(etSendContent))){
+                if (TextUtils.isEmpty(getEditText(etSendContent))) {
                     ToastUtils.showShort("发送内容不能为空");
                     return;
                 }
-                UDPUtils.getInstance().sendMessage(getEditText(etSendContent));
+                UdpUtils.getInstance().sendMessage(getEditText(etSendContent));
                 mAdapter.addDataAndScroll(TimeUtils.getNowString()
-                        +"\n已向目标【"+UDPUtils.getInstance().getCurrentHost()
-                        +":"+UDPUtils.getInstance().getCurrentPort()+"】发送数据: "
+                        + "\n已向目标【" + UdpUtils.getInstance().getCurrentHost()
+                        + ":" + UdpUtils.getInstance().getCurrentPort() + "】发送数据: "
                         + getEditText(etSendContent));
                 break;
             case R.id.btn_udp_receive:
-                if ("开始接收".equals(btnReceive.getText().toString())){
+                if ("开始接收".equals(btnReceive.getText().toString())) {
                     mAdapter.addDataAndScroll("开始接收"
-                            + UDPUtils.getInstance().getCurrentPort() +"端口数据包...");
-                    UDPUtils.getInstance().startUDPSocket();
-                    UDPUtils.getInstance().setReceiveListener(this);
+                            + UdpUtils.getInstance().getCurrentPort() + "端口数据包...");
+                    UdpUtils.getInstance().startUdpSocket();
+                    UdpUtils.getInstance().setReceiveListener(this);
                     btnReceive.setText("停止接收");
                     // 重置接收的监听端口
-                    if (!TextUtils.isEmpty(etReceivePort.getText())){
-                        UDPUtils.getInstance().setUdpPort(Integer.parseInt(getEditText(etReceivePort)));
-                        mAdapter.addDataAndScroll("监听端口变更为："+ getEditText(etReceivePort));
+                    if (!TextUtils.isEmpty(etReceivePort.getText())) {
+                        UdpUtils.getInstance().setUdpPort(Integer.parseInt(getEditText(etReceivePort)));
+                        mAdapter.addDataAndScroll("监听端口变更为：" + getEditText(etReceivePort));
                     }
                 }else {
-                    UDPUtils.getInstance().stopUDPSocket();
+                    UdpUtils.getInstance().stopUdpSocket();
                     btnReceive.setText("开始接收");
                 }
                 break;
@@ -122,7 +122,7 @@ public class UdpActivity extends AppCompatActivity implements
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        UDPUtils.getInstance().stopUDPSocket();
+        UdpUtils.getInstance().stopUdpSocket();
     }
 
     private String getEditText(EditText editText){
