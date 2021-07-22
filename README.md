@@ -20,7 +20,7 @@ allprojects {
 + 在app模块下的`build.gradle`文件中加入
 ```
 dependencies {
-    implementation 'com.github.eurigo:UDPUtils:1.0.3'
+    implementation 'com.github.eurigo:UDPUtils:1.0.4'
 }
 ```
 
@@ -43,6 +43,12 @@ UDPUtils.getInstance().setPort(9090);
 
 // 设置数据接收方的IP，255为广播形式发送
 UDPUtils.getInstance().setHost(192.168.0.255);
+
+// 不指定接收方IP，直接发送全局广播
+UDPUtils.getInstance().sendBroadcastMessage(String s)
+
+// 不指定接收方IP，直接发送全局广播
+UDPUtils.getInstance().sendBroadcastMessage(Map map)
 
 // 发送文本
 UDPUtils.getInstance().sendMessage(String s)
