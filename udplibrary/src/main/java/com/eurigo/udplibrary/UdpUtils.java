@@ -170,6 +170,16 @@ public class UdpUtils {
     /**
      * 发送全局广播
      *
+     * @param map 数据Map
+     */
+    public void sendBroadcastMessage(Map<String, String> map) {
+        setUdpHost(BROADCAST_HOST);
+        sendMessage(map);
+    }
+
+    /**
+     * 发送字节数组消息
+     *
      * @param message 消息文本
      */
     public void sendMessage(byte[] message) {
