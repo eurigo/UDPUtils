@@ -12,6 +12,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -54,7 +55,8 @@ public class UdpUtils {
         }
     }
 
-    public static final String DEFAULT_SOCKET_HOST = "192.168.42.129";
+    public static final String DEFAULT_SOCKET_HOST = "192.168.0.1";
+    public static final String BROADCAST_HOST = "255.255.255.255";
     public static final int DEFAULT_SOCKET_UDP_PORT = 9090;
 
     private String udpHost = "";
@@ -151,6 +153,42 @@ public class UdpUtils {
                 isThreadRunning = true;
                 Log.e(TAG, "UDP clientThread is running...");
                 receiveMessage();
+            }
+        });
+    }
+
+    /**
+     * 发送全局广播
+     *
+     * @param message 消息文本
+     */
+    public void sendBroadcastMessage(String message) {
+        setUdpHost(BROADCAST_HOST);
+        sendMessage(message);
+    }
+
+    /**
+     * 发送全局广播
+     *
+     * @param message 消息文本
+     */
+    public void sendMessage(byte[] message) {
+        if (client == null) {
+            startUdpSocket();
+        }
+        Log.e(TAG, "发送的消息：" + Arrays.toString(message));
+        executorService.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    InetAddress targetAddress = InetAddress.getByName(getCurrentHost());
+                    DatagramPacket packet = new DatagramPacket(message
+                            , message.length
+                            , targetAddress, getCurrentPort());
+                    client.send(packet);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
