@@ -24,6 +24,14 @@ dependencies {
 }
 ```
 
++ 在app模块下的AndroidManifest.xml添加权限
+```
+<manifest
+    ...
+    <uses-permission android:name="android.permission.INTERNET" />
+/>
+```
+
 ### API
 + #### 接收数据
 ```
