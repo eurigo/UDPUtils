@@ -1,5 +1,13 @@
 package com.eurigo.udplibrary;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.DhcpInfo;
+import android.net.LinkProperties;
+import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -8,11 +16,17 @@ import androidx.annotation.NonNull;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -22,6 +36,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
+
+import static android.os.Build.VERSION_CODES.M;
 
 /**
  * @author Eurigo
@@ -55,8 +71,7 @@ public class UdpUtils {
         }
     }
 
-    public static final String DEFAULT_SOCKET_HOST = "192.168.0.1";
-    public static final String BROADCAST_HOST = "255.255.255.255";
+    public static final String DEFAULT_SOCKET_HOST = "192.168.43.255";
     public static final int DEFAULT_SOCKET_UDP_PORT = 9090;
 
     private String udpHost = "";
@@ -157,13 +172,14 @@ public class UdpUtils {
         });
     }
 
+
     /**
-     * 发送全局广播
+     * 自动获取广播地址并发送广播消息
      *
      * @param message 消息文本
      */
-    public void sendBroadcastMessage(String message) {
-        setUdpHost(BROADCAST_HOST);
+    public void sendBroadcastMessage(Context context, String message) {
+        getBroadcastHost(context);
         sendMessage(message);
     }
 
@@ -172,8 +188,30 @@ public class UdpUtils {
      *
      * @param map 数据Map
      */
-    public void sendBroadcastMessage(Map<String, String> map) {
-        setUdpHost(BROADCAST_HOST);
+    public void sendBroadcastMessage(Context context, Map<String, String> map) {
+        getBroadcastHost(context);
+        sendMessage(map);
+    }
+
+    /**
+     * 发送基于Android设备热点的广播
+     * 当连接孤立的Android设备通讯时，建议使用此方法发送广播
+     *
+     * @param message 消息文本
+     */
+    public void sendBroadcastMessageInAndroidHotspot(String message) {
+        setUdpHost(DEFAULT_SOCKET_HOST);
+        sendMessage(message);
+    }
+
+    /**
+     * 发送基于Android设备热点的广播
+     * 当连接孤立的Android设备通讯时，建议使用此方法发送广播
+     *
+     * @param map 数据Map
+     */
+    public void sendBroadcastMessageInAndroidHotspot(Map<String, String> map) {
+        setUdpHost(DEFAULT_SOCKET_HOST);
         sendMessage(map);
     }
 
@@ -270,6 +308,30 @@ public class UdpUtils {
             client = null;
         }
         onUdpReceiveListener = null;
+    }
+
+    /**
+     * 获取广播IP地址
+     * 有些路由器/Wi-Fi热点不支持255.255.255.255广播地址（例如：用Android手机做Wi-Fi热点的时候）
+     * 会出现“ENETUNREACH (Network is unreachable)”的异常，因此，为了保证程序成功发送广播包，建议使用直接广播地址
+     *
+     * @param context 上下文
+     * @return 广播IP地址
+     */
+    public String getBroadcastHost(Context context) {
+        WifiManager wifiManager = (WifiManager) context.getApplicationContext()
+                .getSystemService(Context.WIFI_SERVICE);
+        DhcpInfo dhcp = wifiManager.getDhcpInfo();
+        if (dhcp == null) {
+            return DEFAULT_SOCKET_HOST;
+        }
+        int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
+        StringBuilder builder = new StringBuilder();
+        for (int k = 0; k < 4; k++) {
+            builder.append(((broadcast >> k * 8) & 0xFF)).append(".");
+        }
+        builder.deleteCharAt(builder.length() - 1);
+        return builder.toString();
     }
 
     /**

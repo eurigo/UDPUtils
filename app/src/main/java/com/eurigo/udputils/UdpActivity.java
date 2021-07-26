@@ -1,18 +1,28 @@
 package com.eurigo.udputils;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.DhcpInfo;
+import android.net.LinkProperties;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.NetworkUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
+import com.blankj.utilcode.util.Utils;
 import com.eurigo.udplibrary.UdpUtils;
 import com.google.android.material.button.MaterialButton;
 
@@ -35,8 +45,9 @@ public class UdpActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.udp_receive_activity);
         initView();
-        mAdapter.addDataAndScroll("本机WIFI地址:  "+ NetworkUtils.getIpAddressByWifi());
-        mAdapter.addDataAndScroll("本机Ipv4地址:  "+ NetworkUtils.getIPAddress(true));
+        mAdapter.addDataAndScroll("本机WiFi地址:  " + NetworkUtils.getIpAddressByWifi());
+        mAdapter.addDataAndScroll("本机Ipv4地址:  " + NetworkUtils.getIPAddress(true));
+        mAdapter.addDataAndScroll("本机广播地址:  " + UdpUtils.getInstance().getBroadcastHost(this));
     }
     
     private void initView(){
