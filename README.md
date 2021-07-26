@@ -36,31 +36,36 @@ dependencies {
 + #### 接收数据
 ```
 // 设置监听端口，不设置默认为9090
-UDPUtils.getInstance().setPort(9090);
+UdpUtils.getInstance().setPort(9090);
 
 // 打开Socket
-UDPUtils.getInstance().startUDPSocket();
+UdpUtils.getInstance().startUDPSocket();
 
 // 注册接收回调
-UDPUtils.getInstance().setReceiveListener(new OnUdpReceiveListener);
+UdpUtils.getInstance().setReceiveListener(new OnUdpReceiveListener);
 ```
 + #### 发送数据
 ```
 // 设置数据接收方的端口
-UDPUtils.getInstance().setPort(9090);
+UdpUtils.getInstance().setPort(9090);
 
-// 设置数据接收方的IP，255为广播形式发送
-UDPUtils.getInstance().setHost(192.168.0.255);
-
-// 不指定接收方IP，直接发送全局广播
-UDPUtils.getInstance().sendBroadcastMessage(String s)
+// 设置数据接收方的IP
+UdpUtils.getInstance().setHost(192.168.43.255);
 
 // 不指定接收方IP，直接发送全局广播
-UDPUtils.getInstance().sendBroadcastMessage(Map map)
+UdpUtils.getInstance().sendBroadcastMessage(String s)
+
+// 不指定接收方IP，直接发送全局广播
+UdpUtils.getInstance().sendBroadcastMessage(Map map)
 
 // 发送文本
-UDPUtils.getInstance().sendMessage(String s)
+UdpUtils.getInstance().sendMessage(String s)
 
 // 发送Json
-UDPUtils.getInstance().sendMessage(Map map)
+UdpUtils.getInstance().sendMessage(Map map)
+```
++ #### 其他
+```
+// 获取广播地址
+UdpUtils.getInstance().getBroadcastHost(Context context)
 ```
