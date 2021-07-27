@@ -1,4 +1,5 @@
-# UDPUtils [![](https://jitpack.io/v/eurigo/UDPUtils.svg)](https://jitpack.io/#eurigo/UDPUtils)
+# UDPUtils  [![](https://jitpack.io/v/eurigo/UDPUtils.svg)](https://jitpack.io/#eurigo/UDPUtils)
+
 Android UDP通讯工具类，支持Json格式传输。
 
 + [Github](https://github.com/eurigo/UDPUtils)
@@ -20,7 +21,7 @@ allprojects {
 + 在app模块下的`build.gradle`文件中加入
 ```
 dependencies {
-    implementation 'com.github.eurigo:UDPUtils:1.0.6'
+    implementation 'com.github.eurigo:UDPUtils:1.0.7'
 }
 ```
 
