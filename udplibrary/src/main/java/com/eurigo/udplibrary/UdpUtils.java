@@ -1,13 +1,8 @@
 package com.eurigo.udplibrary;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.net.ConnectivityManager;
 import android.net.DhcpInfo;
-import android.net.LinkProperties;
-import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -16,28 +11,21 @@ import androidx.annotation.NonNull;
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.Pattern;
-
-import static android.os.Build.VERSION_CODES.M;
 
 /**
  * @author Eurigo
@@ -156,12 +144,12 @@ public class UdpUtils {
      * 开启接收数据的线程
      **/
     private void startSocketThread() {
-        executorService = new ThreadPoolExecutor(2 * CPU_COUNT + 1
+        executorService = new ThreadPoolExecutor(CPU_COUNT
                 , 2 * CPU_COUNT + 1
                 , 30
                 , TimeUnit.SECONDS
                 , new LinkedBlockingQueue<>()
-                , new UdpThreadFactory("io", Thread.NORM_PRIORITY));
+                , new UdpThreadFactory());
         executorService.execute(new Runnable() {
             @Override
             public void run() {
@@ -366,13 +354,12 @@ public class UdpUtils {
     private static final class UdpThreadFactory extends AtomicLong
             implements ThreadFactory {
         private static final AtomicInteger POOL_NUMBER = new AtomicInteger(1);
-        private static final long serialVersionUID = -9209200509960368598L;
         private final String namePrefix;
         private final int priority;
         private final boolean isDaemon;
 
-        UdpThreadFactory(String prefix, int priority) {
-            this(prefix, priority, false);
+        UdpThreadFactory() {
+            this(TAG, Thread.NORM_PRIORITY, false);
         }
 
         UdpThreadFactory(String prefix, int priority, boolean isDaemon) {
@@ -390,19 +377,19 @@ public class UdpUtils {
                 public void run() {
                     try {
                         super.run();
-                    } catch (Throwable t) {
-                        Log.e("ThreadUtils", "Request threw uncaught throwable", t);
+                    } catch (Throwable e) {
+                        Log.e(TAG, "run threw throwable", e);
                     }
                 }
             };
             t.setDaemon(isDaemon);
+            t.setPriority(priority);
             t.setUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
                 @Override
                 public void uncaughtException(Thread t, Throwable e) {
-                    System.out.println(e);
+                    Log.e(TAG, t.getName() + "Request threw uncaught throwable", e);
                 }
             });
-            t.setPriority(priority);
             return t;
         }
     }
