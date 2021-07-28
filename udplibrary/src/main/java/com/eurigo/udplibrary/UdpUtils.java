@@ -6,8 +6,6 @@ import android.net.wifi.WifiManager;
 import android.text.TextUtils;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-
 import com.google.gson.JsonObject;
 
 import java.io.IOException;
@@ -19,7 +17,6 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -371,7 +368,7 @@ public class UdpUtils {
         }
 
         @Override
-        public Thread newThread(@NonNull Runnable r) {
+        public Thread newThread(Runnable r) {
             Thread t = new Thread(r, namePrefix + getAndIncrement()) {
                 @Override
                 public void run() {
