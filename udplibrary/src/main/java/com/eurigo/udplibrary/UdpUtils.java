@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.util.Arrays;
 import java.util.Map;
@@ -46,7 +47,9 @@ public class UdpUtils {
         }
         try {
             // Socket接收数据监听的端口，默认为9090
-            client = new DatagramSocket(getCurrentPort());
+            client = new DatagramSocket(null);
+            client.setReuseAddress(true);
+            client.bind(new InetSocketAddress(getCurrentPort()));
             if (receivePacket == null) {
                 receivePacket = new DatagramPacket(receiveByte, BUFFER_LENGTH);
             }

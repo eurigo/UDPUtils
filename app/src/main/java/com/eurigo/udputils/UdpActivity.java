@@ -1,28 +1,18 @@
 package com.eurigo.udputils;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
-import android.net.ConnectivityManager;
-import android.net.DhcpInfo;
-import android.net.LinkProperties;
-import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.NetworkUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.blankj.utilcode.util.ToastUtils;
-import com.blankj.utilcode.util.Utils;
 import com.eurigo.udplibrary.UdpUtils;
 import com.google.android.material.button.MaterialButton;
 
@@ -99,15 +89,14 @@ public class UdpActivity extends AppCompatActivity implements
                 break;
             case R.id.btn_udp_receive:
                 if ("开始接收".equals(btnReceive.getText().toString())) {
-                    mAdapter.addDataAndScroll("开始接收"
-                            + UdpUtils.getInstance().getCurrentPort() + "端口数据包...");
-                    UdpUtils.getInstance().startUdpSocket();
-                    UdpUtils.getInstance().setReceiveListener(this);
-                    btnReceive.setText("停止接收");
                     // 重置接收的监听端口
                     if (!TextUtils.isEmpty(etReceivePort.getText())) {
                         UdpUtils.getInstance().setUdpPort(Integer.parseInt(getEditText(etReceivePort)));
-                        mAdapter.addDataAndScroll("监听端口变更为：" + getEditText(etReceivePort));
+                        mAdapter.addDataAndScroll("开始接收"
+                                + UdpUtils.getInstance().getCurrentPort() + "端口数据包...");
+                        UdpUtils.getInstance().startUdpSocket();
+                        UdpUtils.getInstance().setReceiveListener(this);
+                        btnReceive.setText("停止接收");
                     }
                 }else {
                     UdpUtils.getInstance().stopUdpSocket();
