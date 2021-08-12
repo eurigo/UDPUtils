@@ -37,7 +37,7 @@ dependencies {
 + #### 接收数据
 ```
 // 设置监听端口，不设置默认为9090
-UdpUtils.getInstance().setPort(9090);
+UdpUtils.getInstance().setUdpPort(9090);
 
 // 打开Socket
 UdpUtils.getInstance().startUDPSocket();
@@ -48,10 +48,10 @@ UdpUtils.getInstance().setReceiveListener(new OnUdpReceiveListener);
 + #### 发送数据
 ```
 // 设置数据接收方的端口
-UdpUtils.getInstance().setPort(9090);
+UdpUtils.getInstance().setUdpPort(9090);
 
 // 设置数据接收方的IP
-UdpUtils.getInstance().setHost(192.168.43.255);
+UdpUtils.getInstance().setUdpHost(192.168.43.255);
 
 // 不指定接收方IP，直接发送全局广播
 UdpUtils.getInstance().sendBroadcastMessage(String s)
@@ -69,4 +69,10 @@ UdpUtils.getInstance().sendMessage(Map map)
 ```
 // 获取广播地址
 UdpUtils.getInstance().getBroadcastHost(Context context)
+
+// 获取当前UDP发送地址
+UdpUtils.getInstance().getCurrentHost(Context context)
+
+// 获取当前UDP发送端口
+UdpUtils.getInstance().getCurrentPort(Context context)
 ```

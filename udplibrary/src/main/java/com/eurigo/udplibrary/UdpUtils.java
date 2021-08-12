@@ -173,7 +173,7 @@ public class UdpUtils {
      *
      * @param map 数据Map
      */
-    public void sendBroadcastMessage(Context context, Map<String, String> map) {
+    public void sendBroadcastMessage(Context context, Map<String, Object> map) {
         getBroadcastHost(context);
         sendMessage(map);
     }
@@ -195,7 +195,7 @@ public class UdpUtils {
      *
      * @param map 数据Map
      */
-    public void sendBroadcastMessageInAndroidHotspot(Map<String, String> map) {
+    public void sendBroadcastMessageInAndroidHotspot(Map<String, Object> map) {
         setUdpHost(DEFAULT_SOCKET_HOST);
         sendMessage(map);
     }
@@ -254,18 +254,19 @@ public class UdpUtils {
 
     /**
      * 发送json数据
+     *
      * @param map 数据Map
      */
-    public void sendMessage(Map<String, String> map){
+    public void sendMessage(Map<String, Object> map) {
         if (client == null) {
             startUdpSocket();
         }
         JsonObject object = new JsonObject();
         // 包装Json
-        for (String key : map.keySet()){
-            object.addProperty(key, map.get(key));
+        for (String key : map.keySet()) {
+            object.addProperty(key, String.valueOf(map.get(key)));
         }
-        Log.e(TAG, "发送的消息："+object.toString());
+        Log.e(TAG, "发送的消息：" + object.toString());
         executorService.execute(new Runnable() {
             @Override
             public void run() {
