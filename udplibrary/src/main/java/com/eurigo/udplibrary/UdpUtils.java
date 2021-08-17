@@ -196,7 +196,7 @@ public class UdpUtils {
      * @param message 消息文本
      */
     public void sendBroadcastMessage(Context context, String message) {
-        getBroadcastHost(context);
+        setUdpHost(getBroadcastHost(context));
         sendMessage(message);
     }
 
@@ -206,7 +206,7 @@ public class UdpUtils {
      * @param map 数据Map
      */
     public void sendBroadcastMessage(Context context, Map<String, Object> map) {
-        getBroadcastHost(context);
+        setUdpHost(getBroadcastHost(context));
         sendMessage(map);
     }
 
