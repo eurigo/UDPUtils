@@ -19,9 +19,10 @@ allprojects {
 ```
   
 + 在app模块下的`build.gradle`文件中加入
+
 ```
 dependencies {
-    implementation 'com.github.eurigo:UDPUtils:1.0.9'
+    implementation 'com.github.eurigo:UDPUtils:1.1.0'
 }
 ```
 
