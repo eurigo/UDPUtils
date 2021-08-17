@@ -39,11 +39,11 @@ dependencies {
 // 设置监听端口，不设置默认为9090
 UdpUtils.getInstance().setUdpPort(9090);
 
+// 注册接收回调，在打开socket前设置，重新打开socket后也需设置
+UdpUtils.getInstance().setReceiveListener(new OnUdpReceiveListener);
+
 // 打开Socket
 UdpUtils.getInstance().startUDPSocket();
-
-// 注册接收回调
-UdpUtils.getInstance().setReceiveListener(new OnUdpReceiveListener);
 ```
 + #### 发送数据
 ```
@@ -67,6 +67,9 @@ UdpUtils.getInstance().sendMessage(Map map)
 ```
 + #### 其他
 ```
+// 重启UDP，网络切换后需要调用，接收回调也需要设置
+UdpUtils.getInstance().restartUdpSocket()
+
 // 获取广播地址
 UdpUtils.getInstance().getBroadcastHost(Context context)
 

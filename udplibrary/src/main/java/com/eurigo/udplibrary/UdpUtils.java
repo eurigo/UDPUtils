@@ -41,6 +41,9 @@ public class UdpUtils {
         return SingletonHelper.INSTANCE;
     }
 
+    /**
+     * 打开UDP线程
+     */
     public void startUdpSocket() {
         if (client != null) {
             return;
@@ -57,6 +60,32 @@ public class UdpUtils {
         } catch (SocketException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 停止UDP
+     **/
+    public void stopUdpSocket() {
+        isThreadRunning = false;
+        receivePacket = null;
+        if (client != null) {
+            client.close();
+            client = null;
+        }
+        onUdpReceiveListener = null;
+        try {
+            executorService.shutdownNow();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 重启UDP服务
+     **/
+    public void restartUdpSocket() {
+        stopUdpSocket();
+        startUdpSocket();
     }
 
     public static final String DEFAULT_SOCKET_HOST = "192.168.43.255";
@@ -284,19 +313,6 @@ public class UdpUtils {
                 }
             }
         });
-    }
-
-    /**
-     * 停止UDP
-     **/
-    public void stopUdpSocket() {
-        isThreadRunning = false;
-        receivePacket = null;
-        if (client != null) {
-            client.close();
-            client = null;
-        }
-        onUdpReceiveListener = null;
     }
 
     /**

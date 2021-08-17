@@ -24,11 +24,12 @@ import java.util.ArrayList;
  * desc   :
  */
 public class UdpActivity extends AppCompatActivity implements
-        View.OnClickListener, UdpUtils.OnUdpReceiveListener {
+        View.OnClickListener, UdpUtils.OnUdpReceiveListener, NetworkUtils.OnNetworkStatusChangedListener {
 
     private LogAdapter mAdapter;
     private MaterialButton btnSend, btnReceive;
     private EditText etSendHost, etSendPort, etSendContent, etReceivePort;
+    private boolean isStartUdp = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,7 @@ public class UdpActivity extends AppCompatActivity implements
         mAdapter.addDataAndScroll("本机WiFi地址:  " + NetworkUtils.getIpAddressByWifi());
         mAdapter.addDataAndScroll("本机Ipv4地址:  " + NetworkUtils.getIPAddress(true));
         mAdapter.addDataAndScroll("本机广播地址:  " + UdpUtils.getInstance().getBroadcastHost(this));
+        NetworkUtils.registerNetworkStatusChangedListener(this);
     }
     
     private void initView(){
@@ -94,17 +96,46 @@ public class UdpActivity extends AppCompatActivity implements
                         UdpUtils.getInstance().setUdpPort(Integer.parseInt(getEditText(etReceivePort)));
                         mAdapter.addDataAndScroll("开始接收"
                                 + UdpUtils.getInstance().getCurrentPort() + "端口数据包...");
-                        UdpUtils.getInstance().startUdpSocket();
                         UdpUtils.getInstance().setReceiveListener(this);
+                        UdpUtils.getInstance().startUdpSocket();
                         btnReceive.setText("停止接收");
+                        // 标记开始
+                        isStartUdp = true;
                     }
                 }else {
                     UdpUtils.getInstance().stopUdpSocket();
                     btnReceive.setText("开始接收");
+                    // 标记结束
+                    isStartUdp = false;
                 }
                 break;
             default:
                 break;
+        }
+    }
+
+    @Override
+    public void onDisconnected() {
+        if (isStartUdp) {
+            mAdapter.addDataAndScroll("网络已断开，停止UDP传输");
+            UdpUtils.getInstance().stopUdpSocket();
+            btnReceive.setText("开始接收");
+            isStartUdp = false;
+        }
+    }
+
+    @Override
+    public void onConnected(NetworkUtils.NetworkType networkType) {
+        if (!isStartUdp) {
+            UdpUtils.getInstance().setUdpPort(9090);
+            UdpUtils.getInstance().setReceiveListener(this);
+            UdpUtils.getInstance().startUdpSocket();
+            mAdapter.addDataAndScroll("网络已连接，开始UDP传输，接听接口为：" + UdpUtils.getInstance().getCurrentPort());
+            mAdapter.addDataAndScroll("本机WiFi地址:  " + NetworkUtils.getIpAddressByWifi());
+            mAdapter.addDataAndScroll("本机Ipv4地址:  " + NetworkUtils.getIPAddress(true));
+            mAdapter.addDataAndScroll("本机广播地址:  " + UdpUtils.getInstance().getBroadcastHost(this));
+            btnReceive.setText("停止接收");
+            isStartUdp = true;
         }
     }
 
