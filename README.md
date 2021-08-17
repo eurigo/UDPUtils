@@ -22,7 +22,7 @@ allprojects {
 
 ```
 dependencies {
-    implementation 'com.github.eurigo:UDPUtils:1.1.0'
+    implementation 'com.github.eurigo:UDPUtils:1.1.1'
 }
 ```
 
