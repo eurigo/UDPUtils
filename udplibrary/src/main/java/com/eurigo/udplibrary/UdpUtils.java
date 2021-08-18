@@ -1,8 +1,11 @@
 package com.eurigo.udplibrary;
 
+import static android.os.Build.VERSION_CODES.M;
+
 import android.content.Context;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -329,6 +332,13 @@ public class UdpUtils {
         DhcpInfo dhcp = wifiManager.getDhcpInfo();
         if (dhcp == null) {
             return DEFAULT_SOCKET_HOST;
+        }
+        if (Build.VERSION.SDK_INT <= M) {
+            int address = dhcp.serverAddress;
+            return ((address & 0xFF)
+                    + "." + ((address >> 8) & 0xFF)
+                    + "." + ((address >> 16) & 0xFF)
+                    + ".255");
         }
         int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
         StringBuilder builder = new StringBuilder();
