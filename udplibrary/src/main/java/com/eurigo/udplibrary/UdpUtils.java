@@ -144,7 +144,7 @@ public class UdpUtils {
                 try {
                     client.receive(receivePacket);
                 } catch (IOException e) {
-                    Log.e(TAG, "UDP数据包接收失败！线程停止");
+                    Log.e(TAG, "UDP Thread is Stop!!");
                     stopUdpSocket();
                     e.printStackTrace();
                     return;
@@ -186,7 +186,7 @@ public class UdpUtils {
             @Override
             public void run() {
                 isThreadRunning = true;
-                Log.e(TAG, "UDP clientThread is running...");
+                Log.e(TAG, "UDP Thread is running...");
                 receiveMessage();
             }
         });
@@ -405,7 +405,7 @@ public class UdpUtils {
                     try {
                         super.run();
                     } catch (Throwable e) {
-                        Log.e(TAG, "run threw throwable", e);
+                        Log.e(TAG, "UDP Thread run threw throwable", e);
                     }
                 }
             };
