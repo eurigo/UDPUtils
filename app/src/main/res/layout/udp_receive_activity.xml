@@ -4,8 +4,6 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:focusableInTouchMode="true"
-    android:focusable="true"
     android:keepScreenOn="true"
     >
 
@@ -15,6 +13,7 @@
         android:layout_height="@dimen/dp_40"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginTop="?attr/actionBarSize"
         android:text="目标IP："
         android:gravity="center"
         />
@@ -25,7 +24,8 @@
         android:layout_height="@dimen/dp_40"
         app:layout_constraintStart_toEndOf="@+id/tv_send_host"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv_send_host"
+        app:layout_constraintBottom_toBottomOf="@+id/tv_send_host"
         android:gravity="center"
         tools:text="192.168.1142.255"
         android:background="@null"

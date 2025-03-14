@@ -1,24 +1,39 @@
 plugins {
     id 'com.android.library'
+    id 'maven-publish'
 }
-// JitPack Maven
-apply plugin: 'com.github.dcendents.android-maven'
-// Your Group
-group='com.github.eurigo'
-group='com.gitee.eurigo'
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                from components.release
+                groupId = 'com.eurigo'
+                artifactId = 'udputils'
+                version = '1.0.0'
+            }
+        }
+    }
+}
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
+    namespace "com.eurigo.udplibrary"
+
+    compileSdk 35
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 30
-        versionCode 1
-        versionName "1.0"
+        minSdk 21
+        targetSdk 35
+        versionCode 21
+        versionName "1.4.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+    }
+
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+        }
     }
 
     buildTypes {
