@@ -22,7 +22,7 @@ allprojects {
 
 ```
 dependencies {
-    implementation 'com.github.eurigo:UDPUtils:1.1.3'
+    implementation 'com.github.eurigo:UDPUtils:1.2.0'
 }
 ```
 
@@ -52,7 +52,7 @@ UdpUtils.getInstance().startUDPSocket();
 UdpUtils.getInstance().setUdpPort(9090);
 
 // 设置数据接收方的IP
-UdpUtils.getInstance().setUdpHost(192.168.43.255);
+UdpUtils.getInstance().setUdpHost(192.168.1.18);
 
 // 不指定接收方IP，直接发送全局广播
 UdpUtils.getInstance().sendBroadcastMessage(String s)

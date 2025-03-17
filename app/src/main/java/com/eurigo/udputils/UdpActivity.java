@@ -4,14 +4,10 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.WindowInsets;
 import android.widget.EditText;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -41,14 +37,11 @@ public class UdpActivity extends AppCompatActivity implements
         EdgeToEdge.enable(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.udp_receive_activity);
-
         initView();
         mAdapter.addDataAndScroll("本机WiFi地址: " + NetworkUtils.getIpAddressByWifi());
         mAdapter.addDataAndScroll("本机IPV4地址: " + NetworkUtils.getIPAddress(true));
         mAdapter.addDataAndScroll("本机广播地址: " + UdpUtils.getInstance().getBroadcastHost(this));
-        mAdapter.addDataAndScroll("本机子网广播地址: " );
-        mAdapter.addDataAndScroll("本机组播地址: " );
-        mAdapter.addDataAndScroll("本机mDNS地址: 224.0.0.251:5353" );
+        mAdapter.addDataAndScroll("本机子网广播地址: " + UdpUtils.getInstance().getSubnetBroadcastAddress());
         NetworkUtils.registerNetworkStatusChangedListener(this);
     }
 
@@ -72,6 +65,14 @@ public class UdpActivity extends AppCompatActivity implements
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.btn_udp_send) {
+            if (TextUtils.isEmpty(getEditText(etSendHost)) && TextUtils.isEmpty(getEditText(etSendPort)) && !TextUtils.isEmpty(getEditText(etSendContent))) {
+                UdpUtils.getInstance().setUdpPort(UdpUtils.getInstance().getCurrentPort());
+                UdpUtils.getInstance().sendBroadcastMessage(this, getEditText(etSendContent));
+                mAdapter.addDataAndScroll(TimeUtils.getNowString()
+                        + "\n已发送广播, 端口:" + UdpUtils.getInstance().getCurrentPort()
+                        + getEditText(etSendContent));
+                return;
+            }
             // 重置目标IP
             String host = getEditText(etSendHost);
             if (!UdpUtils.getInstance().isIpAddress(host)) {

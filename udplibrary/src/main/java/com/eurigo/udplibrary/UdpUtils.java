@@ -1,11 +1,8 @@
 package com.eurigo.udplibrary;
 
-import static android.os.Build.VERSION_CODES.M;
-
 import android.content.Context;
 import android.net.DhcpInfo;
 import android.net.wifi.WifiManager;
-import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -16,8 +13,11 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.InterfaceAddress;
+import java.net.NetworkInterface;
 import java.net.SocketException;
-import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -91,7 +91,10 @@ public class UdpUtils {
         startUdpSocket();
     }
 
-    public static final String DEFAULT_SOCKET_HOST = "192.168.43.255";
+    /**
+     * 有些路由器/Wi-Fi热点不支持255.255.255.255广播地址（例如：用Android手机做Wi-Fi热点的时候）
+     */
+    public static final String DEFAULT_SOCKET_HOST = "255.255.255.255";
     public static final int DEFAULT_SOCKET_UDP_PORT = 9090;
 
     private String udpHost = "";
@@ -106,7 +109,7 @@ public class UdpUtils {
     }
 
     public String getCurrentHost() {
-        return TextUtils.isEmpty(DEFAULT_SOCKET_HOST)? DEFAULT_SOCKET_HOST : udpHost;
+        return TextUtils.isEmpty(udpHost) ? DEFAULT_SOCKET_HOST : udpHost;
     }
 
     public int getCurrentPort() {
@@ -134,6 +137,15 @@ public class UdpUtils {
     private DatagramPacket receivePacket;
     private DatagramSocket client;
     private ExecutorService executorService;
+    private WifiManager mWifiManager;
+
+    private WifiManager getWifiManger(Context context) {
+        if (mWifiManager == null) {
+            mWifiManager = (WifiManager) context.getApplicationContext()
+                    .getSystemService(Context.WIFI_SERVICE);
+        }
+        return mWifiManager;
+    }
 
     /**
      * 处理接受到的消息
@@ -161,7 +173,7 @@ public class UdpUtils {
             if (onUdpReceiveListener != null) {
                 try {
                     onUdpReceiveListener.onReceived(strReceive);
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -192,7 +204,6 @@ public class UdpUtils {
         });
     }
 
-
     /**
      * 自动获取广播地址并发送广播消息
      *
@@ -214,29 +225,27 @@ public class UdpUtils {
     }
 
     /**
-     * 发送基于Android设备热点的广播
-     * 当连接孤立的Android设备通讯时，建议使用此方法发送广播
+     * 自定义广播地址并发送广播消息
      *
      * @param message 消息文本
      */
-    public void sendBroadcastMessageInAndroidHotspot(String message) {
-        setUdpHost(DEFAULT_SOCKET_HOST);
+    public void sendBroadcastInCustomHost(String host, String message) {
+        setUdpHost(host);
         sendMessage(message);
     }
 
     /**
-     * 发送基于Android设备热点的广播
-     * 当连接孤立的Android设备通讯时，建议使用此方法发送广播
+     * 自定义广播地址并发送广播消息
      *
      * @param map 数据Map
      */
-    public void sendBroadcastMessageInAndroidHotspot(Map<String, Object> map) {
-        setUdpHost(DEFAULT_SOCKET_HOST);
+    public void sendBroadcastInCustomHost(String host, Map<String, Object> map) {
+        setUdpHost(host);
         sendMessage(map);
     }
 
     /**
-     * 发送字节数组消息
+     * 发送字节数组消息,注意提前设置目标地址
      *
      * @param message 消息文本
      */
@@ -244,25 +253,21 @@ public class UdpUtils {
         if (client == null) {
             startUdpSocket();
         }
-        Log.e(TAG, "发送的消息：" + Arrays.toString(message));
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    InetAddress targetAddress = InetAddress.getByName(getCurrentHost());
-                    DatagramPacket packet = new DatagramPacket(message
-                            , message.length
-                            , targetAddress, getCurrentPort());
-                    client.send(packet);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        executorService.execute(() -> {
+            try {
+                InetAddress targetAddress = InetAddress.getByName(getCurrentHost());
+                DatagramPacket packet = new DatagramPacket(message
+                        , message.length
+                        , targetAddress, getCurrentPort());
+                client.send(packet);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
     }
 
     /**
-     * 发送消息
+     * 发送消息，注意提前设置目标地址
      *
      * @param message 消息文本
      */
@@ -270,25 +275,21 @@ public class UdpUtils {
         if (client == null) {
             startUdpSocket();
         }
-        Log.e(TAG, "发送的消息：" + message);
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    InetAddress targetAddress = InetAddress.getByName(getCurrentHost());
-                    DatagramPacket packet = new DatagramPacket(message.getBytes()
-                            , message.getBytes().length
-                            , targetAddress, getCurrentPort());
-                    client.send(packet);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        executorService.execute(() -> {
+            try {
+                InetAddress targetAddress = InetAddress.getByName(getCurrentHost());
+                DatagramPacket packet = new DatagramPacket(message.getBytes()
+                        , message.getBytes().length
+                        , targetAddress, getCurrentPort());
+                client.send(packet);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
     }
 
     /**
-     * 发送json数据
+     * 发送json数据，注意提前设置目标地址
      *
      * @param map 数据Map
      */
@@ -301,19 +302,15 @@ public class UdpUtils {
         for (String key : map.keySet()) {
             object.addProperty(key, String.valueOf(map.get(key)));
         }
-        Log.e(TAG, "发送的消息：" + object.toString());
-        executorService.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    InetAddress targetAddress = InetAddress.getByName(getCurrentHost());
-                    DatagramPacket packet = new DatagramPacket(object.toString().getBytes()
-                            , object.toString().getBytes().length
-                            , targetAddress, getCurrentPort());
-                    client.send(packet);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        executorService.execute(() -> {
+            try {
+                InetAddress targetAddress = InetAddress.getByName(getCurrentHost());
+                DatagramPacket packet = new DatagramPacket(object.toString().getBytes()
+                        , object.toString().getBytes().length
+                        , targetAddress, getCurrentPort());
+                client.send(packet);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
     }
@@ -321,32 +318,51 @@ public class UdpUtils {
     /**
      * 获取广播IP地址
      * 有些路由器/Wi-Fi热点不支持255.255.255.255广播地址（例如：用Android手机做Wi-Fi热点的时候）
-     * 会出现“ENETUNREACH (Network is unreachable)”的异常，因此，为了保证程序成功发送广播包，建议使用直接广播地址
+     * 会出现“ENETUNREACH (Network is unreachable)”的异常，因此，为了保证程序成功发送广播包，建议使用组播广播地址
      *
      * @param context 上下文
      * @return 广播IP地址
      */
     public String getBroadcastHost(Context context) {
-        WifiManager wifiManager = (WifiManager) context.getApplicationContext()
-                .getSystemService(Context.WIFI_SERVICE);
-        DhcpInfo dhcp = wifiManager.getDhcpInfo();
+        DhcpInfo dhcp = getWifiManger(context).getDhcpInfo();
+        // 如果没有ip信息使用组播
         if (dhcp == null) {
             return DEFAULT_SOCKET_HOST;
         }
-        if (Build.VERSION.SDK_INT <= M) {
-            int address = dhcp.serverAddress;
-            return ((address & 0xFF)
-                    + "." + ((address >> 8) & 0xFF)
-                    + "." + ((address >> 16) & 0xFF)
-                    + ".255");
+        // 优先使用子网广播地址
+        if (dhcp.ipAddress != 0) {
+            return getSubnetBroadcastAddress();
         }
-        int broadcast = (dhcp.ipAddress & dhcp.netmask) | ~dhcp.netmask;
-        StringBuilder builder = new StringBuilder();
-        for (int k = 0; k < 4; k++) {
-            builder.append(((broadcast >> k * 8) & 0xFF)).append(".");
+        return DEFAULT_SOCKET_HOST;
+    }
+
+    /**
+     * 获取Wifi网络下的子网广播地址
+     *
+     * @return 子网广播地址
+     */
+    public String getSubnetBroadcastAddress() {
+        try {
+            Enumeration<NetworkInterface> nis = NetworkInterface.getNetworkInterfaces();
+            while (nis.hasMoreElements()) {
+                NetworkInterface ni = nis.nextElement();
+                // 活跃接口 + 非环回 + 名称匹配（如 wlan0）
+                if (!ni.isUp() || ni.isLoopback() || !ni.getName().startsWith("wlan")) {
+                    continue;
+                }
+                List<InterfaceAddress> ias = ni.getInterfaceAddresses();
+                for (int i = 0, size = ias.size(); i < size; i++) {
+                    InterfaceAddress ia = ias.get(i);
+                    InetAddress broadcast = ia.getBroadcast();
+                    if (broadcast != null) {
+                        return broadcast.getHostAddress();
+                    }
+                }
+            }
+        } catch (SocketException e) {
+            e.printStackTrace();
         }
-        builder.deleteCharAt(builder.length() - 1);
-        return builder.toString();
+        return DEFAULT_SOCKET_HOST;
     }
 
     /**
@@ -356,7 +372,7 @@ public class UdpUtils {
      * @return 是否是IP
      */
     public boolean isIpAddress(String regexString) {
-        return regexString != null && regexString.length() > 0 && Pattern.matches(REGEX_IP, regexString);
+        return regexString != null && !regexString.isEmpty() && Pattern.matches(REGEX_IP, regexString);
     }
 
     private static class SingletonHelper {
